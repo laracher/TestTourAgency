@@ -1,13 +1,14 @@
 package com.example.demo.controller;
 
-import com.example.demo.domain.Users;
+import com.example.demo.model.DTO.UsersDTO;
+import com.example.demo.model.domain.Users;
 import com.example.demo.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
+//контроллер для пользователей
 @RestController
 @RequestMapping("users")
 public class UsersController {
@@ -19,25 +20,24 @@ public class UsersController {
         this.appService = appService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public List<Users> getAll(Map<String, Object> model){
-        List<Users> allUsers = appService.getAllUsers();
-        model.put("allUsers", allUsers);
-        return allUsers;
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public List<UsersDTO> getAllUsers(Map<String, Object> model){
+        return appService.getAllUsers();
     }
 
-    @RequestMapping(value = "{userId}", method = RequestMethod.GET)
-    public Users getOne(@PathVariable Long userId) {
-        return appService.getOneUser(userId);
+    @RequestMapping(value = "/all/{userId}", method = RequestMethod.GET)
+    public UsersDTO getOneUser(@PathVariable Long userId, Map<String, Object> model) {
+        UsersDTO user = appService.getOneUser(userId);
+        return user;
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public Users addUser(@RequestBody Users user) {
+    public UsersDTO addUser(@RequestBody UsersDTO user) {
         return appService.saveUser(user);
     }
 
     @RequestMapping(value = "{userId}",method = RequestMethod.PUT)
-    public Users updateUser(@RequestBody Users users) {
+    public UsersDTO updateUser(@RequestBody UsersDTO users) {
         return appService.saveUser(users);
     }
 
@@ -46,8 +46,3 @@ public class UsersController {
         appService.removeUser(userId);
     }
 }
-
-/*        <!--<span>{{email}}</span>-->
-        <!--<span>{{password}}</span>-->
-        <!--<span>{{active}}</span>-->
-        <!--<span>{{birthday}}</span>-->*/

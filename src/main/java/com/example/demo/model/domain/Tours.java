@@ -1,11 +1,10 @@
-package com.example.demo.domain;
+package com.example.demo.model.domain;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "TOURS")

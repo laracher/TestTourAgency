@@ -1,4 +1,4 @@
-package com.example.demo.domain;
+package com.example.demo.model.domain;
 
 import javax.persistence.*;
 import java.util.Date;

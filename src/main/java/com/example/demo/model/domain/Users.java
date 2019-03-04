@@ -1,8 +1,8 @@
-package com.example.demo.domain;
+package com.example.demo.model.domain;
 
-import org.hibernate.criterion.Order;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,9 +10,8 @@ import java.util.*;
 
 @Entity
 @Table(name = "USERS")
-public class Users implements Serializable
+public class Users implements Serializable, UserDetails
 {
-
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -27,7 +26,7 @@ public class Users implements Serializable
     private String lastName;
 
     @Column(name = "email", length = 50)
-    private String email;
+    private String username;
 
     @Column(name = "password", length = 50)
     private String password;
@@ -44,8 +43,6 @@ public class Users implements Serializable
     private List<Orders> listOrders = new ArrayList<>();
 
     public Users() {}
-
-
 
     public Long getUserId() {
         return userId;
@@ -71,16 +68,52 @@ public class Users implements Serializable
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
+    @Override
+    public Collection<GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("ADMIN"));
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
+    @Override
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return active;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return active;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return active;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return active;
+    }
+
+//    public String getEmail() {
+//        return email;
+//    }
+//
+//    public void setEmail(String email) {
+//        this.email = email;
+//    }
+
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setPassword(String password) {
@@ -119,7 +152,7 @@ public class Users implements Serializable
         return Objects.equals(userId, users.userId) &&
                 Objects.equals(firstName, users.firstName) &&
                 Objects.equals(lastName, users.lastName) &&
-                Objects.equals(email, users.email) &&
+                Objects.equals(username, users.username) &&
                 Objects.equals(password, users.password) &&
                 Objects.equals(active, users.active) &&
                 Objects.equals(birthday, users.birthday) &&
@@ -129,7 +162,7 @@ public class Users implements Serializable
     @Override
     public int hashCode() {
 
-        return Objects.hash(userId, firstName, lastName, email, password, active, birthday, listOrders);
+        return Objects.hash(userId, firstName, lastName, username, password, active, birthday, listOrders);
     }
 
     @Override
@@ -138,7 +171,7 @@ public class Users implements Serializable
                 "userId=" + userId +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
+                ", email='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", active=" + active +
                 ", birthday=" + birthday +
