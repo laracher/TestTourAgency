@@ -16,7 +16,7 @@ public class UsersDTO implements Serializable {
     private String password;
     private Boolean active;
     private Date birthday;
-    private List<Orders> listOrders = new ArrayList<>();
+    private List<OrdersDTO> listOrders = new ArrayList<>();
 
     public Long getUserId() {
         return userId;
@@ -74,11 +74,11 @@ public class UsersDTO implements Serializable {
         this.birthday = birthday;
     }
 
-    public List<Orders> getListOrders() {
+    public List<OrdersDTO> getListOrders() {
         return listOrders;
     }
 
-    public void setListOrders(List<Orders> listOrders) {
+    public void setListOrders(List<OrdersDTO> listOrders) {
         this.listOrders = listOrders;
     }
 

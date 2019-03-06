@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.DTO.UsersDTO;
-import com.example.demo.model.domain.Users;
 import com.example.demo.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +25,8 @@ public class UsersController {
     }
 
     @RequestMapping(value = "/all/{userId}", method = RequestMethod.GET)
-    public UsersDTO getOneUser(@PathVariable Long userId, Map<String, Object> model) {
-        UsersDTO user = appService.getOneUser(userId);
-        return user;
+    public UsersDTO getOneUser(@PathVariable Long userId) {
+        return appService.getOneUser(userId);
     }
 
     @RequestMapping(method = RequestMethod.POST)

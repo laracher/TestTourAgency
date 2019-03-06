@@ -3,7 +3,6 @@ package com.example.demo.service;
 import com.example.demo.model.DTO.OrdersDTO;
 import com.example.demo.model.DTO.ToursDTO;
 import com.example.demo.model.DTO.UsersDTO;
-import com.example.demo.model.domain.Orders;
 import com.example.demo.model.domain.Tours;
 import com.example.demo.model.domain.Users;
 import com.example.demo.repository.OrdersRepository;
@@ -49,7 +48,7 @@ public class AppServiceTest {
     //предварительно создаем пользователей, заказы и туры в тестовой БД
     @Before
     public void setUp() {
-        Users user1 = new Users();
+        UsersDTO user1 = new UsersDTO();
         user1.setFirstName("Vasya");
         user1.setLastName("Pupkin");
         user1.setUsername("vaspup@mail.ru");
@@ -57,10 +56,10 @@ public class AppServiceTest {
         user1.setActive(false);
         user1.setBirthday(new Timestamp(1549811226));
 
-        List<Users> usersList = new ArrayList<>();
+        List<UsersDTO> usersList = new ArrayList<>();
         usersList.add(user1);
 
-        Tours tour1 = new Tours();
+        ToursDTO tour1 = new ToursDTO();
         tour1.setName("Tour in Russia");
         tour1.setDescription("The best tour");
         tour1.setLocation("Russia");
@@ -68,19 +67,19 @@ public class AppServiceTest {
         tour1.setEndDate(new Timestamp(1549811226));
         tour1.setCountLimit(15);
 
-        List<Tours> toursList = new ArrayList<>();
+        List<ToursDTO> toursList = new ArrayList<>();
         toursList.add(tour1);
 
-        Orders order1 = new Orders();
+        OrdersDTO order1 = new OrdersDTO();
         order1.setConfirmed(false);
         order1.setTimeKey(new Timestamp(1549811226));
-        order1.setUser(user1);
-        order1.setTour(tour1);
+        order1.setUsersDTO(user1);
+        order1.setToursDTO(tour1);
 
-        List<Orders> ordersList = new ArrayList<>();
+        List<OrdersDTO> ordersList = new ArrayList<>();
         ordersList.add(order1);
 
-        Users user2 = new Users();
+        UsersDTO user2 = new UsersDTO();
         user2.setFirstName("Ivan");
         user2.setLastName("Ivanov");
         user2.setUsername("ivanov@mail.ru");
@@ -88,9 +87,9 @@ public class AppServiceTest {
         user2.setActive(false);
         user2.setBirthday(new Timestamp(1549811226));
         user2.setListOrders(ordersList);
-        //usersRepository.save(user2);
+        appService.saveUser(user2);
 
-        Tours tour2 = new Tours();
+        ToursDTO tour2 = new ToursDTO();
         tour2.setName("Tour in India");
         tour2.setDescription("The best tour");
         tour2.setLocation("India");
@@ -98,8 +97,9 @@ public class AppServiceTest {
         tour2.setEndDate(new Timestamp(1549811226));
         tour2.setCountLimit(15);
         tour2.setListOrders(ordersList);
-        toursRepository.save(tour2);
-        System.out.println();
+
+        appService.saveTour(tour2);
+        appService.saveOrder(order1);
     }
 
     // получение всех пользователей
@@ -148,12 +148,10 @@ public class AppServiceTest {
         newOrder.setTimeKey(new Timestamp(1549811226));
         newOrder.setUsersDTO(newUser);
         newOrder.setToursDTO(newTour);
+
         appService.saveUser(newUser);
         appService.saveTour(newTour);
-
-        appService.saveUser(newUser);
-
-        UsersDTO user = appService.getOneUser(7L);
+        UsersDTO user = appService.getOneUser(6L);
 
         assertEquals(user, newUser);
     }
@@ -162,13 +160,13 @@ public class AppServiceTest {
     @Test
     public void updateUser() {
         //получаем пользователя из сервиса, изменяем его имя
-        UsersDTO oldUser = appService.getOneUser(4L);
+        UsersDTO oldUser = appService.getOneUser(1L);
         oldUser.setFirstName("IGOR");
         // сохраняем измененного пользователя в сервис
 
-        appService.saveUser(oldUser).getUserId();
+        appService.saveUser(oldUser);
 
-        UsersDTO newUser = appService.getOneUser(4L);
+        UsersDTO newUser = appService.getOneUser(1L);
         //сравниваем пользователя, полученного после изменения
         // и пользователя, которого получили перед изменением
         assertEquals(newUser, oldUser);
@@ -179,12 +177,87 @@ public class AppServiceTest {
         // считаем количество строк в тестовой БД
         long countRows = usersRepository.count();
         System.out.println("строк " + countRows);
-        assertEquals(2, countRows);
+        assertEquals(1, countRows);
         // удаляем пользователя
-        appService.removeUser(4L);
+        appService.removeUser(1L);
         //снова считаем количество строк в БД и сравниваем его с первым значением,
         // если строк меньше, значит удаление прошло успешно
         countRows = usersRepository.count();
+        assertEquals(0, countRows);
+    }
+
+    // тестирование CRUD для туров
+    @Test
+    public void getAllTours() {
+        List<Tours> toursList = toursRepository.findAll();
+        List<ToursDTO> newDtoList = new ArrayList<>();
+
+        for (Tours tours: toursList) {
+            newDtoList.add(MappingUtils.convertToursToDTO(tours));
+        }
+        List<ToursDTO> toursDTOList = appService.getAllTours();
+        assertEquals(newDtoList, toursDTOList);
+    }
+
+    @Test
+    public void saveTour() {
+        UsersDTO user = new UsersDTO();
+        user.setFirstName("Lilia");
+        user.setLastName("Zorina");
+        user.setUsername("lil@mail.ru");
+        user.setPassword("555");
+        user.setActive(false);
+        user.setBirthday(new Timestamp(1549811226));
+
+        List<UsersDTO> usersList = new ArrayList<>();
+        usersList.add(user);
+
+        ToursDTO newTour = new ToursDTO();
+        newTour.setName("Tour Japan");
+        newTour.setDescription("New Tour in Japan");
+        newTour.setLocation("Japan");
+        newTour.setStartDate(new Timestamp(1549811226));
+        newTour.setEndDate(new Timestamp(1549811226));
+        newTour.setCountLimit(10);
+
+        List<ToursDTO> toursList = new ArrayList<>();
+        toursList.add(newTour);
+
+        OrdersDTO order = new OrdersDTO();
+        order.setConfirmed(false);
+        order.setTimeKey(new Timestamp(1549811226));
+        order.setUsersDTO(user);
+        order.setToursDTO(newTour);
+
+        appService.saveUser(user);
+        appService.saveTour(newTour);
+        appService.saveOrder(order);
+
+        ToursDTO tour = appService.getOneTour(7L);
+
+        assertEquals(tour, newTour);
+    }
+
+    @Test
+    public void updateTour() {
+        ToursDTO oldTour = appService.getOneTour(3L);
+        System.out.println("Название тура " + oldTour.getName());
+        oldTour.setName("RUSSIA THE BEST!");
+        appService.saveTour(oldTour);
+        ToursDTO newTour = appService.getOneTour(3L);
+        System.out.println("Название тура " + newTour.getName());
+        assertEquals(newTour, oldTour);
+    }
+
+    @Test
+    public void removeTour() {
+        long countRows = toursRepository.count();
+        System.out.println("строк " + countRows);
         assertEquals(1, countRows);
+
+        appService.removeTour(3L);
+
+        countRows = toursRepository.count();
+        assertEquals(0, countRows);
     }
 }
